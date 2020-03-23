@@ -1,12 +1,14 @@
-const fs = require('fs');
+// const passwords = require('./lib/passwords');
+// const readPasswords = passwords.readPasswords;
+// const writePasswords = passwords.writePasswords;
+const { readPasswords, writePasswords } = require('./lib/passwords');
 
 const [command, key, value] = process.argv.slice(2);
 
 function get() {
   console.log('called GET', key);
   try {
-    const passwordsJSON = fs.readFileSync('./db.json', 'utf8');
-    const passwords = JSON.parse(passwordsJSON);
+    const passwords = readPasswords();
 
     console.log(passwords[key]);
     return passwords;
@@ -17,16 +19,26 @@ function get() {
 
 function set() {
   console.log('called SET', key, value);
-  // Read db.json
-  // Update value by key
-  // Write db.json
+
   try {
-    const passwordsJSON = fs.readFileSync('db.json', 'utf8');
-    const passwords = JSON.parse(passwordsJSON);
+    const passwords = readPasswords();
     passwords[key] = value;
     console.log(passwords[key]);
 
-    fs.writeFileSync('db.json', JSON.stringify(passwords, null, 2));
+    writePasswords(passwords);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function unset() {
+  console.log('called UNSET', key);
+  try {
+    const passwords = readPasswords();
+    delete passwords[key];
+    console.log(passwords[key]);
+
+    writePasswords(passwords);
   } catch (error) {
     console.error(error);
   }
@@ -36,6 +48,8 @@ if (command === 'get') {
   get();
 } else if (command === 'set') {
   set();
+} else if (command === 'unset') {
+  unset();
 } else {
   console.error('Unknown command');
 }
