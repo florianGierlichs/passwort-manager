@@ -1,9 +1,17 @@
 const { get, set, unset } = require('./lib/commands');
-const { askForPassword } = require('./lib/questions');
+const { askForPassword, askForMasterPassword } = require('./lib/questions');
+const { readMasterPassword } = require('./lib/masterPassword');
 
 const [command, key] = process.argv.slice(2);
 
 async function run() {
+  const answeredMasterPassword = await askForMasterPassword();
+  const masterPassword = readMasterPassword();
+  if (answeredMasterPassword !== masterPassword) {
+    console.error('Fuck off!');
+    return;
+  }
+
   if (command === 'get') {
     get(key);
   } else if (command === 'set') {
